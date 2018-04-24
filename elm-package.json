@@ -9,6 +9,7 @@
     "exposed-modules": [
       "SVGTextRendering",
       "SVGTextSizing",
+      "SVGTextSPI",
       "TextDiagrams"
     ],
     "native-modules": false,
