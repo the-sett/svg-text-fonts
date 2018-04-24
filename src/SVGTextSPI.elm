@@ -16,10 +16,14 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 
 
+{-| Defines the type of the text-to-svg port.
+-}
 type alias TextToSVGPort msg =
     TextToSVGRequest -> Cmd msg
 
 
+{-| Defines the type of the text-to-svg response port.
+-}
 type alias TextToSVGResponsePort msg =
     (TextPath -> msg) -> Sub msg
 
