@@ -1,16 +1,27 @@
-port module SVGTextPort
+module SVGTextSPI
     exposing
-        ( TextToSVGRequest
+        ( TextToSVGPort
+        , TextToSVGResponsePort
+        , TextToSVGRequest
         , TextPath
-        , textToSVG
-        , textToSVGResponse
         )
 
 {-| Ports needed to request/subscribe to text to SVG conversion events.
+
+@docs TextToSVGPort, TextToSVGResponsePort, TextToSVGRequest, TextPath
+
 -}
 
 import Json.Decode as Decode
 import Json.Encode as Encode
+
+
+type alias TextToSVGPort msg =
+    TextToSVGRequest -> Cmd msg
+
+
+type alias TextToSVGResponsePort msg =
+    (TextPath -> msg) -> Sub msg
 
 
 {-| Defines the fields needed to make a request to convert text to SVG.
@@ -76,14 +87,3 @@ decodeTextPath =
                 (Decode.field "letterSpacing" Decode.float)
             )
         )
-
-
-{-| Requests that text is converted to SVG.
--}
-port textToSVG : TextToSVGRequest -> Cmd msg
-
-
-{-| Creates a subscription to listen for responses to requests to convert text
-to SVG
--}
-port textToSVGResponse : (TextPath -> msg) -> Sub msg

@@ -28,7 +28,7 @@ import Dict exposing (Dict)
 import EveryDict exposing (EveryDict)
 import MultiDict exposing (MultiDict)
 import Set exposing (Set)
-import SVGTextPort exposing (TextToSVGRequest, TextPath, textToSVG, textToSVGResponse)
+import SVGTextSPI exposing (TextToSVGPort, TextToSVGResponsePort, TextToSVGRequest, TextPath)
 import TextDiagrams exposing (TextDiagram)
 
 
@@ -60,10 +60,10 @@ type Msg
 
 {-| Defines the subscription needed to listen for responses on the text conversion response port.
 -}
-subscriptions : Model a -> Sub Msg
-subscriptions model =
+subscriptions : TextToSVGResponsePort Msg -> Model a -> Sub Msg
+subscriptions responsePort model =
     Sub.batch
-        [ textToSVGResponse FontMetrics ]
+        [ responsePort FontMetrics ]
 
 
 {-| Handles updates from the text to SVG return port, that provide text converted to SVG
@@ -148,22 +148,22 @@ requests on the text to SVG port, to do the conversion work. The new model conta
 a set of diagrams needing to be sized, updated with the list of diagram requests to
 be processed.
 -}
-convertTextToSvg : List (TextDiagram a) -> Model a -> ( Model a, Cmd Msg )
-convertTextToSvg diagrams model =
-    List.foldl convertDiagram ( model, Cmd.none ) diagrams
+convertTextToSvg : TextToSVGPort Msg -> List (TextDiagram a) -> Model a -> ( Model a, Cmd Msg )
+convertTextToSvg textToSVGPort diagrams model =
+    List.foldl (convertDiagram textToSVGPort) ( model, Cmd.none ) diagrams
 
 
 {-| For a diagram, updates the model with the diagram to be sized, and provides
 commands to do the sizing operations.
 -}
-convertDiagram : TextDiagram a -> ( Model a, Cmd Msg ) -> ( Model a, Cmd Msg )
-convertDiagram diagram ( model, cmds ) =
+convertDiagram : TextToSVGPort Msg -> TextDiagram a -> ( Model a, Cmd Msg ) -> ( Model a, Cmd Msg )
+convertDiagram textToSVGPort diagram ( model, cmds ) =
     let
         diagramId =
             model.id + 1
     in
         List.foldl
-            convertLabel
+            (convertLabel textToSVGPort)
             ( { model
                 | id = diagramId
                 , diagramsToSize = Dict.insert diagramId diagram model.diagramsToSize
@@ -176,16 +176,16 @@ convertDiagram diagram ( model, cmds ) =
 {-| For a single label within a diagram, updates the model with the diagram to be
 sized, and provides commands to do the sizing operations.
 -}
-convertLabel : TextDiagrams.PathSpec -> ( Model a, Cmd Msg ) -> ( Model a, Cmd Msg )
-convertLabel label ( model, cmds ) =
+convertLabel : TextToSVGPort Msg -> TextDiagrams.PathSpec -> ( Model a, Cmd Msg ) -> ( Model a, Cmd Msg )
+convertLabel textToSVGPort label ( model, cmds ) =
     ( { model | textToSize = MultiDict.insert model.id label model.textToSize }
-    , Cmd.batch <| [ commandForLabel label model.id, cmds ]
+    , Cmd.batch <| [ commandForLabel textToSVGPort label model.id, cmds ]
     )
 
 
-commandForLabel : TextDiagrams.PathSpec -> Int -> Cmd Msg
-commandForLabel label id =
-    textToSVG
+commandForLabel : TextToSVGPort Msg -> TextDiagrams.PathSpec -> Int -> Cmd Msg
+commandForLabel textToSVGPort label id =
+    textToSVGPort
         { id = id
         , text = label.text
         , font = label.font
