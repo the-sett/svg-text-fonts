@@ -6,13 +6,18 @@
     "source-directories": [
         "src/"
     ],
-    "exposed-modules": [],
+    "exposed-modules": [
+      "SVGTextRendering",
+      "SVGTextSizing",
+      "TextDiagrams"
+    ],
     "native-modules": false,
     "dependencies": {
       "elm-lang/core": "5.0.0 <= v < 6.0.0",
       "elm-lang/html": "2.0.0 <= v < 3.0.0",
       "elm-lang/svg": "2.0.0 <= v < 3.0.0",
       "elm-community/typed-svg": "2.0.0 <= v < 3.0.0",
+      "eeue56/elm-all-dict": "2.0.1 <= v < 3.0.0",
       "opensolid/geometry": "1.1.0 <= v < 2.0.0",
       "opensolid/svg": "1.0.2 <= v < 2.0.0",
       "the-sett/elm-multi-dict": "1.0.0 <= v < 2.0.0",

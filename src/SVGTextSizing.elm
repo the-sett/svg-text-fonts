@@ -11,7 +11,6 @@ module SVGTextSizing
 import Dict exposing (Dict)
 import EveryDict exposing (EveryDict)
 import MultiDict exposing (MultiDict)
-import Porter
 import Set exposing (Set)
 import SVGTextPort exposing (TextToSVGRequest, TextPath, textToSVG, textToSVGResponse)
 import TextDiagrams exposing (TextDiagram)

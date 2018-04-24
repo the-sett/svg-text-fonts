@@ -1,7 +1,10 @@
-module SVGTextRendering exposing (..)
+module SVGTextRendering exposing (TextRenderFunc, textAsPath, textAsText, TextAlignment(..))
 
 {-| Renders text as an SVG `text` element, or as a `path` element, with a common
 type for these text rendering methods.
+
+@docs TextRenderFunc, textAsPath, textAsText, TextAlignment
+
 -}
 
 import EveryDict exposing (EveryDict)
@@ -14,12 +17,16 @@ import TypedSvg.Events exposing (onClick)
 import TypedSvg.Types exposing (px, Fill(..), ShapeRendering(..), Opacity(..), AnchorAlignment(..), StrokeLinecap(..), StrokeLinejoin(..), TextRendering(..), Transform(..))
 
 
+{-| The possible horizontal alignments for text.
+-}
 type TextAlignment
     = LeftAlign
     | CenterAlign
     | RightAlign
 
 
+{-| A type alias for the text rendering functions, as their types are quite longt.
+-}
 type alias TextRenderFunc msg =
     PathSpec
     -> EveryDict PathSpec Path
@@ -30,6 +37,10 @@ type alias TextRenderFunc msg =
     -> Svg msg
 
 
+{-| Renders a PathSpec as an SVG path.
+This will be geometrically accurate and stable under motion, but the text rendering will not be hinted
+and look a bit rough. Use this when animating text.
+-}
 textAsPath : TextRenderFunc msg
 textAsPath pathSpec pathLookup align xpos ypos attributes =
     let
@@ -57,6 +68,11 @@ textAsPath pathSpec pathLookup align xpos ypos attributes =
             []
 
 
+{-| Renders a PathSpec as SVG text rendered by the browser.
+This will be hinted and rendered for maximum legibility. It will look crisp and clear
+. It will have geometric aberations that show up under animation as a jittering about
+of the text. Use this for static text.
+-}
 textAsText : TextRenderFunc msg
 textAsText pathSpec pathLookup align xpos ypos attributes =
     let
