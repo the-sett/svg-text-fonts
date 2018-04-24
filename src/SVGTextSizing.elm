@@ -8,6 +8,22 @@ module SVGTextSizing
         , convertTextToSvg
         )
 
+{-| Provides functionality to convert text into SVG paths.
+
+This is implemented on top of the opentype.js library, and uses ports to handle
+the native code interaction with this library, even though the text conversion
+functions routines are pure functions and do not really need to work asynchronously.
+
+The `update` cycle for this module must be linked into code that makes use of it,
+including its subscriptions.
+
+
+# Text to path conversion cycle
+
+@docs Model, Msg, subscriptions, init, update, convertTextToSvg
+
+-}
+
 import Dict exposing (Dict)
 import EveryDict exposing (EveryDict)
 import MultiDict exposing (MultiDict)
@@ -16,6 +32,9 @@ import SVGTextPort exposing (TextToSVGRequest, TextPath, textToSVG, textToSVGRes
 import TextDiagrams exposing (TextDiagram)
 
 
+{-| The internal state of the text conversion. This keeps track of which diagrams are
+still to complete, and which `PathSpec`s.
+-}
 type alias Model a =
     { diagramsToSize : Dict Int (TextDiagram a)
     , textToSize : MultiDict Int TextDiagrams.PathSpec
@@ -23,6 +42,8 @@ type alias Model a =
     }
 
 
+{-| Createa a new empty initial state for the text conversion.
+-}
 init : Model a
 init =
     { diagramsToSize = Dict.empty
@@ -31,10 +52,14 @@ init =
     }
 
 
+{-| Describes the text rendering outcome events from the conversion ports.
+-}
 type Msg
     = FontMetrics TextPath
 
 
+{-| Defines the subscription needed to listen for responses on the text conversion response port.
+-}
 subscriptions : Model a -> Sub Msg
 subscriptions model =
     Sub.batch
