@@ -1,21 +1,21 @@
 module TextToSVG
     exposing
-        ( Model
+        ( TextDiagram
+        , Path
+        , PathSpec
+        , Options
+        , Model
         , Msg
         , subscriptions
         , init
         , update
-        , convertTextToSvg
+        , textToSvg
         , TextRenderFunc
         , textAsPath
         , textAsText
         , TextAlignment(..)
         , TextToSVGPort
         , TextToSVGResponsePort
-        , TextDiagram
-        , Path
-        , PathSpec
-        , Options
         )
 
 {-| Provides functionality to convert text into SVG paths.
@@ -35,7 +35,7 @@ including its subscriptions.
 
 # Text to path conversion cycle.
 
-@docs Model, Msg, subscriptions, init, update, convertTextToSvg
+@docs Model, Msg, subscriptions, init, update, textToSvg
 
 
 # SVG text rednering functions, with path or browser rendered implmenetations.
@@ -217,8 +217,8 @@ requests on the text to SVG port, to do the conversion work. The new model conta
 a set of diagrams needing to be sized, updated with the list of diagram requests to
 be processed.
 -}
-convertTextToSvg : TextToSVGPort Msg -> List (TextDiagram a) -> Model a -> ( Model a, Cmd Msg )
-convertTextToSvg textToSVGPort diagrams model =
+textToSvg : TextToSVGPort Msg -> List (TextDiagram a) -> Model a -> ( Model a, Cmd Msg )
+textToSvg textToSVGPort diagrams model =
     List.foldl (convertDiagram textToSVGPort) ( model, Cmd.none ) diagrams
 
 
