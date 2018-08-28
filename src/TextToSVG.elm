@@ -1,22 +1,9 @@
-module TextToSVG
-    exposing
-        ( TextDiagram
-        , Path
-        , PathSpec
-        , Options
-        , Model
-        , Msg
-        , subscriptions
-        , init
-        , update
-        , textToSvg
-        , TextRenderFunc
-        , textAsPath
-        , textAsText
-        , TextAlignment(..)
-        , TextToSVGPort
-        , TextToSVGResponsePort
-        )
+module TextToSVG exposing
+    ( TextDiagram, Path, PathSpec, Options
+    , Model, Msg, subscriptions, init, update, textToSvg
+    , TextRenderFunc, textAsPath, textAsText, TextAlignment(..)
+    , TextToSVGPort, TextToSVGResponsePort
+    )
 
 {-| Provides functionality to convert text into SVG paths.
 
@@ -55,12 +42,12 @@ import Json.Decode as Decode
 import Json.Encode as Encode
 import MultiDict exposing (MultiDict)
 import Set exposing (Set)
-import TypedSvg exposing (svg, g, circle, rect, text_, tspan, line, path)
-import TypedSvg.Attributes.InPx exposing (cx, cy, r, strokeWidth, x, y, x1, y1, x2, y2, rx, ry, width, height, fontSize)
-import TypedSvg.Attributes exposing (viewBox, shapeRendering, fill, fillOpacity, stroke, strokeDasharray, strokeLinecap, strokeLinejoin, fontFamily, textAnchor, textRendering, color, d, transform)
-import TypedSvg.Core exposing (svgNamespace, text, Svg, Attribute)
+import TypedSvg exposing (circle, g, line, path, rect, svg, text_, tspan)
+import TypedSvg.Attributes exposing (color, d, fill, fillOpacity, fontFamily, shapeRendering, stroke, strokeDasharray, strokeLinecap, strokeLinejoin, textAnchor, textRendering, transform, viewBox)
+import TypedSvg.Attributes.InPx exposing (cx, cy, fontSize, height, r, rx, ry, strokeWidth, width, x, x1, x2, y, y1, y2)
+import TypedSvg.Core exposing (Attribute, Svg, svgNamespace, text)
 import TypedSvg.Events exposing (onClick)
-import TypedSvg.Types exposing (px, Fill(..), ShapeRendering(..), Opacity(..), AnchorAlignment(..), StrokeLinecap(..), StrokeLinejoin(..), TextRendering(..), Transform(..))
+import TypedSvg.Types exposing (AnchorAlignment(..), Fill(..), Opacity(..), ShapeRendering(..), StrokeLinecap(..), StrokeLinejoin(..), TextRendering(..), Transform(..), px)
 
 
 {-| Denotes a diagram containing text with a function that can be used to correctly
@@ -149,10 +136,10 @@ update action model =
                 ( remainingDiagrams, completedDiagrams ) =
                     findCompletedDiagrams { model | diagramsToSize = updatedDiagrams, textToSize = remainingText }
             in
-                ( { model | diagramsToSize = remainingDiagrams, textToSize = remainingText }
-                , Cmd.none
-                , completedDiagrams
-                )
+            ( { model | diagramsToSize = remainingDiagrams, textToSize = remainingText }
+            , Cmd.none
+            , completedDiagrams
+            )
 
 
 addTextPathToDiagram : TextPath -> Model a -> ( MultiDict Int PathSpec, Dict Int (TextDiagram a) )
@@ -173,26 +160,26 @@ addTextPathToDiagram textPath model =
             , fontSize = textPath.request.fontSize
             }
     in
-        case maybeDiagram of
-            Nothing ->
-                ( model.textToSize, model.diagramsToSize )
+    case maybeDiagram of
+        Nothing ->
+            ( model.textToSize, model.diagramsToSize )
 
-            Just diagram ->
-                let
-                    sizedDiagram =
-                        { diagram
-                            | pathsForLabels =
-                                EveryDict.insert
-                                    pathSpec
-                                    { width = textPath.width
-                                    , path = textPath.pathData
-                                    }
-                                    diagram.pathsForLabels
-                        }
-                in
-                    ( MultiDict.remove id pathSpec model.textToSize
-                    , Dict.insert id sizedDiagram model.diagramsToSize
-                    )
+        Just diagram ->
+            let
+                sizedDiagram =
+                    { diagram
+                        | pathsForLabels =
+                            EveryDict.insert
+                                pathSpec
+                                { width = textPath.width
+                                , path = textPath.pathData
+                                }
+                                diagram.pathsForLabels
+                    }
+            in
+            ( MultiDict.remove id pathSpec model.textToSize
+            , Dict.insert id sizedDiagram model.diagramsToSize
+            )
 
 
 {-| For each diagram id that has no more labels to size, remove that diagram from the
@@ -202,8 +189,9 @@ findCompletedDiagrams : Model a -> ( Dict Int (TextDiagram a), List (TextDiagram
 findCompletedDiagrams model =
     Dict.foldl
         (\id diagram ( dict, list ) ->
-            if (MultiDict.get id model.textToSize) == Nothing then
+            if MultiDict.get id model.textToSize == Nothing then
                 ( Dict.remove id dict, diagram :: list )
+
             else
                 ( dict, list )
         )
@@ -231,15 +219,15 @@ convertDiagram textToSVGPort diagram ( model, cmds ) =
         diagramId =
             model.id + 1
     in
-        List.foldl
-            (convertLabel textToSVGPort)
-            ( { model
-                | id = diagramId
-                , diagramsToSize = Dict.insert diagramId diagram model.diagramsToSize
-              }
-            , cmds
-            )
-            diagram.labels
+    List.foldl
+        (convertLabel textToSVGPort)
+        ( { model
+            | id = diagramId
+            , diagramsToSize = Dict.insert diagramId diagram model.diagramsToSize
+          }
+        , cmds
+        )
+        diagram.labels
 
 
 {-| For a single label within a diagram, updates the model with the diagram to be
@@ -301,18 +289,18 @@ textAsPath pathSpec pathLookup align xpos ypos attributes =
                     0.0
 
                 CenterAlign ->
-                    (textPath.width / 2)
+                    textPath.width / 2
 
                 RightAlign ->
                     textPath.width
     in
-        path
-            ([ transform [ Translate (xpos - xAlignmentAdjust) ypos ]
-             , d textPath.path
-             ]
-                ++ attributes
-            )
-            []
+    path
+        ([ transform [ Translate (xpos - xAlignmentAdjust) ypos ]
+         , d textPath.path
+         ]
+            ++ attributes
+        )
+        []
 
 
 {-| Renders a PathSpec as SVG text rendered by the browser.
@@ -327,17 +315,17 @@ textAsText pathSpec pathLookup align xpos ypos attributes =
             EveryDict.get pathSpec pathLookup
                 |> Maybe.withDefault { width = 0, path = "" }
     in
-        text_
-            ([ fontFamily [ "Noto Sans" ]
-             , fontSize pathSpec.fontSize
-             , textAnchor <| textAlignToAnchorAlignment align
-             , textRendering TextRenderingOptimizeLegibility
-             ]
-                ++ attributes
-            )
-            [ tspan [ x <| xpos, y <| ypos ]
-                [ text pathSpec.text ]
-            ]
+    text_
+        ([ fontFamily [ "Noto Sans" ]
+         , fontSize pathSpec.fontSize
+         , textAnchor <| textAlignToAnchorAlignment align
+         , textRendering TextRenderingOptimizeLegibility
+         ]
+            ++ attributes
+        )
+        [ tspan [ x <| xpos, y <| ypos ]
+            [ text pathSpec.text ]
+        ]
 
 
 textAlignToAnchorAlignment : TextAlignment -> AnchorAlignment

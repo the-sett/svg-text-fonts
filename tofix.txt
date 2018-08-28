@@ -1,0 +1,7 @@
+  - https://github.com/elm-community/typed-svg
+  - https://github.com/eeue56/elm-all-dict
+  - https://github.com/opensolid/geometry
+  - https://github.com/opensolid/svg
+  - https://github.com/the-sett/elm-multi-dict
+  - https://github.com/Gizra/elm-all-set
+
