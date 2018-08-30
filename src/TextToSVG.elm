@@ -1,5 +1,6 @@
 module TextToSVG exposing
     ( TextDiagram, Path, PathSpec, Options
+    , pathSpecToKey
     , Model, Msg, subscriptions, init, update, textToSvg
     , TextRenderFunc, textAsPath, textAsText, TextAlignment(..)
     , TextToSVGPort, TextToSVGResponsePort
@@ -18,6 +19,11 @@ including its subscriptions.
 # Types describing SVG diagrams with text.
 
 @docs TextDiagram, Path, PathSpec, Options
+
+
+# For working with PathSpecs as dictionary keys.
+
+@docs pathSpecToKey
 
 
 # Text to path conversion cycle.
@@ -80,6 +86,13 @@ type alias PathSpec =
     }
 
 
+{-| Turns a PathSpec into a String, so that it can be used as the key in a dictioary.
+-}
+pathSpecToKey : PathSpec -> String
+pathSpecToKey spec =
+    spec.font ++ ";" ++ String.fromFloat spec.fontSize ++ ";" ++ spec.text
+
+
 {-| Options that can be set to control how text is rendered into SVG paths.
 -}
 type alias Options =
@@ -103,7 +116,7 @@ type alias Model a =
 init : Model a
 init =
     { diagramsToSize = Dict.empty
-    , textToSize = MultiDict.empty
+    , textToSize = MultiDict.empty pathSpecToKey
     , id = 0
     }
 
