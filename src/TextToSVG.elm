@@ -37,7 +37,7 @@ including its subscriptions.
 -}
 
 import Dict exposing (Dict)
-import EveryDict exposing (EveryDict)
+import Dict.Any as AnyDict exposing (AnyDict)
 import Json.Decode as Decode
 import Json.Encode as Encode
 import MultiDict exposing (MultiDict)
@@ -56,7 +56,7 @@ calculate the width of all text in the diagram.
 type alias TextDiagram a =
     { a
         | labels : List PathSpec
-        , pathsForLabels : EveryDict PathSpec Path
+        , pathsForLabels : AnyDict String PathSpec Path
     }
 
 
@@ -93,7 +93,7 @@ still to complete, and which `PathSpec`s.
 -}
 type alias Model a =
     { diagramsToSize : Dict Int (TextDiagram a)
-    , textToSize : MultiDict Int PathSpec
+    , textToSize : MultiDict Int PathSpec String
     , id : Int
     }
 
@@ -103,7 +103,7 @@ type alias Model a =
 init : Model a
 init =
     { diagramsToSize = Dict.empty
-    , textToSize = Dict.empty
+    , textToSize = MultiDict.empty
     , id = 0
     }
 
@@ -142,7 +142,7 @@ update action model =
             )
 
 
-addTextPathToDiagram : TextPath -> Model a -> ( MultiDict Int PathSpec, Dict Int (TextDiagram a) )
+addTextPathToDiagram : TextPath -> Model a -> ( MultiDict Int PathSpec String, Dict Int (TextDiagram a) )
 addTextPathToDiagram textPath model =
     let
         maybeDiagram =
@@ -169,7 +169,7 @@ addTextPathToDiagram textPath model =
                 sizedDiagram =
                     { diagram
                         | pathsForLabels =
-                            EveryDict.insert
+                            AnyDict.insert
                                 pathSpec
                                 { width = textPath.width
                                 , path = textPath.pathData
@@ -264,7 +264,7 @@ type TextAlignment
 -}
 type alias TextRenderFunc msg =
     PathSpec
-    -> EveryDict PathSpec Path
+    -> AnyDict String PathSpec Path
     -> TextAlignment
     -> Float
     -> Float
@@ -280,7 +280,7 @@ textAsPath : TextRenderFunc msg
 textAsPath pathSpec pathLookup align xpos ypos attributes =
     let
         textPath =
-            EveryDict.get pathSpec pathLookup
+            AnyDict.get pathSpec pathLookup
                 |> Maybe.withDefault { width = 0, path = "" }
 
         xAlignmentAdjust =
@@ -312,7 +312,7 @@ textAsText : TextRenderFunc msg
 textAsText pathSpec pathLookup align xpos ypos attributes =
     let
         textPath =
-            EveryDict.get pathSpec pathLookup
+            AnyDict.get pathSpec pathLookup
                 |> Maybe.withDefault { width = 0, path = "" }
     in
     text_

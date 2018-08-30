@@ -13,12 +13,11 @@
         "elm/html": "1.0.0 <= v < 2.0.0",
         "elm/json": "1.0.0 <= v < 2.0.0",
         "elm/svg": "1.0.0 <= v < 2.0.0",
-        "elm-community/typed-svg": "2.0.0 <= v < 3.0.0",
-        "eeue56/elm-all-dict": "2.0.1 <= v < 3.0.0",
-        "opensolid/geometry": "1.1.0 <= v < 2.0.0",
-        "opensolid/svg": "1.0.2 <= v < 2.0.0",
-        "the-sett/elm-multi-dict": "1.0.0 <= v < 2.0.0",
-        "Gizra/elm-all-set": "1.0.0 <= v < 2.0.0"
+        "elm-community/typed-svg": "3.1.0 <= v < 4.0.0",
+        "ianmackenzie/elm-geometry": "1.1.0 <= v < 2.0.0",
+        "ianmackenzie/elm-geometry-svg": "1.0.1 <= v < 2.0.0",
+        "the-sett/elm-one-many": "1.0.0 <= v < 2.0.0",
+        "turboMaCk/any-dict": "1.0.1 <= v < 2.0.0"
     },
     "test-dependencies": {}
 }
