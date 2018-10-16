@@ -1,6 +1,6 @@
 module TextToSVG exposing
     ( TextDiagram, Path, PathSpec, Options
-    , pathSpecToKey
+    , emptyLabelPaths, pathSpecToKey
     , Model, Msg, subscriptions, init, update, textToSvg
     , TextRenderFunc, textAsPath, textAsText, TextAlignment(..)
     , TextToSVGPort, TextToSVGResponsePort
@@ -21,9 +21,9 @@ including its subscriptions.
 @docs TextDiagram, Path, PathSpec, Options
 
 
-# For working with PathSpecs as dictionary keys.
+# For working with PathSpecs as dictionary entries.
 
-@docs pathSpecToKey
+@docs emptyLabelPaths, pathSpecToKey
 
 
 # Text to path conversion cycle.
@@ -64,6 +64,13 @@ type alias TextDiagram a =
         | labels : List PathSpec
         , pathsForLabels : AnyDict String PathSpec Path
     }
+
+
+{-| Creates an empty set of label paths.
+-}
+emptyLabelPaths : AnyDict String PathSpec Path
+emptyLabelPaths =
+    AnyDict.empty pathSpecToKey
 
 
 {-| Encodes a string as an SVG path describing its outline, which can be used to
