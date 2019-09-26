@@ -18,6 +18,9 @@ module TextToSVG
         , TextToSVGResponsePort
         )
 
+-- Modified 2019/09/26 by Yusuf Motara for compatibility with
+-- ianmackenzie/elm-geometry-svg and other updated dependencies
+
 {-| Provides functionality to convert text into SVG paths.
 
 This is implemented on top of the opentype.js library, and uses ports to handle
@@ -50,7 +53,7 @@ including its subscriptions.
 -}
 
 import Dict exposing (Dict)
-import EveryDict exposing (EveryDict)
+import GenericDict
 import Json.Decode as Decode
 import Json.Encode as Encode
 import MultiDict exposing (MultiDict)
@@ -62,14 +65,13 @@ import TypedSvg.Core exposing (svgNamespace, text, Svg, Attribute)
 import TypedSvg.Events exposing (onClick)
 import TypedSvg.Types exposing (px, Fill(..), ShapeRendering(..), Opacity(..), AnchorAlignment(..), StrokeLinecap(..), StrokeLinejoin(..), TextRendering(..), Transform(..))
 
-
 {-| Denotes a diagram containing text with a function that can be used to correctly
 calculate the width of all text in the diagram.
 -}
 type alias TextDiagram a =
     { a
         | labels : List PathSpec
-        , pathsForLabels : EveryDict PathSpec Path
+        , pathsForLabels : GenericDict.Dict PathSpec Path
     }
 
 
@@ -110,6 +112,9 @@ type alias Model a =
     , id : Int
     }
 
+pathSpecToString : PathSpec -> String
+pathSpecToString {text, font, fontSize} =
+    text ++ ";" ++ font ++ ";" ++ (String.fromFloat fontSize)
 
 {-| Createa a new empty initial state for the text conversion.
 -}
@@ -182,7 +187,8 @@ addTextPathToDiagram textPath model =
                     sizedDiagram =
                         { diagram
                             | pathsForLabels =
-                                EveryDict.insert
+                                GenericDict.insert
+                                    pathSpecToString
                                     pathSpec
                                     { width = textPath.width
                                     , path = textPath.pathData
@@ -276,7 +282,7 @@ type TextAlignment
 -}
 type alias TextRenderFunc msg =
     PathSpec
-    -> EveryDict PathSpec Path
+    -> GenericDict.Dict PathSpec Path
     -> TextAlignment
     -> Float
     -> Float
@@ -292,7 +298,7 @@ textAsPath : TextRenderFunc msg
 textAsPath pathSpec pathLookup align xpos ypos attributes =
     let
         textPath =
-            EveryDict.get pathSpec pathLookup
+            GenericDict.get pathSpecToString pathSpec pathLookup
                 |> Maybe.withDefault { width = 0, path = "" }
 
         xAlignmentAdjust =
@@ -324,7 +330,7 @@ textAsText : TextRenderFunc msg
 textAsText pathSpec pathLookup align xpos ypos attributes =
     let
         textPath =
-            EveryDict.get pathSpec pathLookup
+            GenericDict.get pathSpecToString pathSpec pathLookup
                 |> Maybe.withDefault { width = 0, path = "" }
     in
         text_
