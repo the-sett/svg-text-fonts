@@ -3,7 +3,7 @@
     "name": "the-sett/svg-text-fonts",
     "summary": "Render strings using OpenType Fonts into SVG paths.",
     "license": "BSD-3-Clause",
-    "version": "3.1.0",
+    "version": "4.0.0",
     "exposed-modules": [
         "TextToSVG"
     ],
